@@ -11,7 +11,7 @@ blp = Blueprint("Stores", __name__, description="Operation on stores")
 
 
 @blp.route("/store")
-class Store(MethodView):
+class StoreList(MethodView):
     @blp.response(200, StoreSchema(many=True))
     def get(self):
         return StoreModel.query.all()
