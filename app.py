@@ -3,12 +3,17 @@ import models
 from db import db
 from flask import Flask, jsonify
 from flask_smorest import Api
+from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from blocklist import BLOCKLIST
 from resources.item import blp as ItemBlueprint
 from resources.store import blp as StoreBlueprint
 from resources.tag import blp as TagBlueprint
 from resources.user import blp as UserBlueprint
+
+# flask db init
+# flask db migrate
+# flask db upgrade
 
 
 def create_app(db_url=None):
@@ -25,7 +30,7 @@ def create_app(db_url=None):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
-
+    migrate = Migrate(app, db)
     api = Api(app)
 
     app.config["JWT_SECRET_KEY"] = "sometestsecretkey"
