@@ -46,12 +46,20 @@ def create_app(db_url=None):
             )
         )
 
+    @jwt.needs_fresh_token_loader
+    def token_non_fresh_callback(jwt_header, jwt_payload):
+        return (jsonify(
+            {
+                "description": "The token is not fresh",
+                "error": "fresh_token_required"
+            }
+        ))
+
     @jwt.additional_claims_loader
     def add_claim_to_jwt(identity):
         if identity == 1:
             return {"is_admin": True}
         return {"is_admin": False}
-
 
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
