@@ -1,11 +1,12 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from passlib.hash import pbkdf2_sha256
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt
 
 from db import db
 from models import UserModel
 from schemas import UserSchema
+from blocklist import BLOCKLIST
 
 
 blp = Blueprint("Users", "users", description="Operations on users")
@@ -39,6 +40,16 @@ class UserLogin(MethodView):
             access_token = create_access_token(identity=user.id)
             return {"access_token": access_token}
         abort(401, message="Invalid credentials.")
+
+
+@blp.route("/logout")
+class UserLogout(MethodView):
+    @jwt_required()
+    def post(self):
+        jti = get_jwt()["jti"]
+        # Good practice is to store it to db
+        BLOCKLIST.add(jti)
+        return {"message": "Successfully logged out."}
 
 
 @blp.route("/user/<int:user_id>")
